@@ -1,3 +1,3 @@
-# Updated Reports
+# Updated index
 
-This file was updated by run_reports.py
+This is the latest report content.
