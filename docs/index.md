@@ -15,15 +15,4 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
     docs/
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
-
-
-## Automated Update
-This line was added by a Python script.
-
-
-## Automated Update
-Updated on 2025-08-18 11:37:30
-
-
-## Automated Update
-Updated on 2025-08-18 11:39:06
+        
