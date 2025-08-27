@@ -1,4 +1,5 @@
 import os
+import shutil
 from git import Repo, GitCommandError
 
 def main():
@@ -7,34 +8,21 @@ def main():
     LOCAL_DIR = os.path.expanduser("~/my-docs-site")
     INDEX_FILE = os.path.join(LOCAL_DIR, "docs", "index.md")
 
-    # --- Clone or open existing repo ---
-    if not os.path.exists(LOCAL_DIR):
-        print(f"👉 Cloning repository to {LOCAL_DIR}...")
-        repo = Repo.clone_from(REPO_URL, LOCAL_DIR)
-    else:
-        print(f"👉 Opening existing repo at {LOCAL_DIR}...")
-        repo = Repo(LOCAL_DIR)
+    # --- Delete the local repo if it exists ---
+    if os.path.exists(LOCAL_DIR):
+        print(f"🧹 Removing existing repo at {LOCAL_DIR}...")
+        shutil.rmtree(LOCAL_DIR)
 
+    # --- Fresh clone ---
+    print(f"👉 Cloning repository to {LOCAL_DIR}...")
+    repo = Repo.clone_from(REPO_URL, LOCAL_DIR)
     origin = repo.remote(name="origin")
 
-    # --- Stash local changes if any ---
-    if repo.is_dirty(untracked_files=True):
-        print("⚠️ Local changes detected, stashing all changes...")
-        repo.git.stash("save", "--include-untracked")
-
-    # --- Fetch latest changes and reset local main ---
-    print("👉 Fetching latest changes from origin/main...")
-    origin.fetch()
+    # --- Checkout main branch ---
     try:
         repo.git.checkout("main")
     except GitCommandError:
-        repo.git.checkout("-b", "main")  # create main if it doesn't exist
-    repo.git.reset("--hard", "origin/main")
-
-    # --- Restore stashed changes ---
-    if repo.git.stash("list"):
-        print("👉 Restoring stashed changes...")
-        repo.git.stash("pop")
+        repo.git.checkout("-b", "main")
 
     # --- Update index.md ---
     print(f"👉 Updating {INDEX_FILE}...")
@@ -42,10 +30,13 @@ def main():
         f.write("# Latest Reports\n\n")
         f.write("This file is automatically updated by run_reports.py.\n")
 
-    # --- Commit changes if any ---
-    if repo.is_dirty(untracked_files=True):
-        repo.git.add(A=True)
+    # --- Add and commit all changes ---
+    print("👉 Committing all changes...")
+    repo.git.add(A=True)
+    try:
         repo.index.commit("Update index.md via run_reports.py")
+    except GitCommandError:
+        print("⚠️ Nothing to commit (working tree clean).")
 
     # --- Push to GitHub ---
     try:
