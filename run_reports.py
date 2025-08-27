@@ -5,7 +5,7 @@ def main():
     # CONFIG
     REPO_URL = "https://github.com/Trickster138/my-docs-site.git"
     LOCAL_DIR = os.path.expanduser("~/my-docs-site")
-    INDEX_FILE = os.path.join(LOCAL_DIR, "index.md")
+    INDEX_FILE = os.path.join(LOCAL_DIR, "docs", "index.md")
 
     # --- Clone or open existing repo ---
     if not os.path.exists(LOCAL_DIR):
