@@ -6,7 +6,7 @@ from git import Repo
 
 # Run reports
 print("Running reports...")
-run_reports.run()  # this updates and pushes docs/index.md
+run_reports.main()  # this updates and pushes docs/index.md
 print("Reports completed")
 
 # Build the site
