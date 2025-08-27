@@ -1,5 +1,4 @@
 import os
-import shutil
 import datetime
 from git import Repo, GitCommandError
 
@@ -9,21 +8,29 @@ def main():
     LOCAL_DIR = os.getcwd()  # current working directory
     INDEX_FILE = os.path.join(LOCAL_DIR, "docs", "index.md")
 
-    # --- Delete the local repo if it exists ---
-    if os.path.exists(LOCAL_DIR):
-        print(f"🧹 Removing existing repo at {LOCAL_DIR}...")
-        shutil.rmtree(LOCAL_DIR)
+    # --- Clone or open existing repo ---
+    if not os.path.exists(os.path.join(LOCAL_DIR, ".git")):
+        print(f"👉 Cloning repository to {LOCAL_DIR}...")
+        repo = Repo.clone_from(REPO_URL, LOCAL_DIR)
+    else:
+        print(f"👉 Opening existing repo at {LOCAL_DIR}...")
+        repo = Repo(LOCAL_DIR)
+        origin = repo.remote(name="origin")
 
-    # --- Fresh clone ---
-    print(f"👉 Cloning repository to {LOCAL_DIR}...")
-    repo = Repo.clone_from(REPO_URL, LOCAL_DIR)
+        # Fetch latest changes
+        print("👉 Fetching latest changes from origin...")
+        origin.fetch()
+
+        # Reset local main branch to match origin/main
+        try:
+            repo.git.checkout("main")
+        except GitCommandError:
+            repo.git.checkout("-b", "main")  # create if doesn't exist
+
+        print("👉 Resetting local branch to origin/main...")
+        repo.git.reset("--hard", "origin/main")
+
     origin = repo.remote(name="origin")
-
-    # --- Checkout main branch ---
-    try:
-        repo.git.checkout("main")
-    except GitCommandError:
-        repo.git.checkout("-b", "main")
 
     # --- Update index.md with current timestamp ---
     print(f"👉 Updating {INDEX_FILE}...")
