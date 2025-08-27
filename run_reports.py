@@ -6,7 +6,7 @@ from git import Repo, GitCommandError
 def main():
     # CONFIG
     REPO_URL = "https://github.com/Trickster138/my-docs-site.git"
-    LOCAL_DIR = os.path.expanduser("~/my-docs-site")
+    LOCAL_DIR = os.getcwd()  # current working directory
     INDEX_FILE = os.path.join(LOCAL_DIR, "docs", "index.md")
 
     # --- Delete the local repo if it exists ---
