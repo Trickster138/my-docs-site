@@ -1,5 +1,6 @@
 import os
 import shutil
+import datetime
 from git import Repo, GitCommandError
 
 def main():
@@ -24,11 +25,12 @@ def main():
     except GitCommandError:
         repo.git.checkout("-b", "main")
 
-    # --- Update index.md ---
+    # --- Update index.md with current timestamp ---
     print(f"👉 Updating {INDEX_FILE}...")
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(INDEX_FILE, "w") as f:
         f.write("# Latest Reports\n\n")
-        f.write("This file is automatically updated by run_reports.py.\n")
+        f.write(f"This file is automatically updated by run_reports.py on {current_time}.\n")
 
     # --- Add and commit all changes ---
     print("👉 Committing all changes...")
@@ -48,4 +50,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
